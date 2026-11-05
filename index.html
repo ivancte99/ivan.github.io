@@ -17,6 +17,7 @@ body{margin:0}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1117;--card:#181b25;--tx:#eceef6;--mu:#98a0b8;--bd:#272b3a;--ac:#818cf8;--gr:#34d399;--rd:#f87171;--wn:#fbbf24;--wnb:#3a2e0b;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#0f1117;--card:#181b25;--tx:#eceef6;--mu:#98a0b8;--bd:#272b3a;--ac:#818cf8;--gr:#34d399;--rd:#f87171;--wn:#fbbf24;--wnb:#3a2e0b;color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums}
 .w{max-width:960px;margin:0 auto;padding-block:16px 90px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 h1{font-size:20px;margin:0}h2{font-size:15px;margin:0 0 12px}
@@ -30,8 +31,8 @@ button.armed{background:var(--rd);border-color:var(--rd);color:#fff}
 .pill{font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid var(--bd);color:var(--mu);background:var(--card)}
 .pill.ok{color:var(--gr)}.pill.err{color:#fff;background:var(--rd);border-color:var(--rd);cursor:pointer}.pill.pend,.pill.load{color:var(--wn)}
 .warn{background:var(--wnb);color:var(--wn);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:14px}
-.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;padding-bottom:2px}
-.tabs button{white-space:nowrap}.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.tabs button{flex:1 1 auto;white-space:nowrap;text-align:center;padding:9px 12px;font-size:15px}.tabs button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
 .g{display:grid;gap:12px}.g5{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
 .c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;min-width:0}
 .k{color:var(--mu);font-size:12px}.v{font-size:22px;font-weight:700;overflow-wrap:anywhere}
@@ -117,7 +118,7 @@ label.k input,label.k select{width:100%;display:block;margin-top:4px}
 <div class="c"><h2>Resultado</h2><div id="so"></div></div></div></section>
 
 <section id="t-dat" hidden><div class="g g2"><div class="c"><h2>Copia de seguridad</h2>
-<p class="note">Tus datos se guardan solo en este dispositivo, dentro de la app. No hay copia en ningún otro sitio: si pierdes el móvil o desinstalas la app, se pierden. Guarda una copia cada semana en Archivos o en tu nube.</p><p class="k" id="bki"></p>
+<p class="note">Tus datos se guardan solo en este dispositivo, dentro de la app. No hay copia en ningún otro sitio: si pierdes el móvil o desinstalas la app, se pierden. Guarda una copia cada semana en Archivos o en tu nube.</p><p class="k" id="bki"></p><p class="k">Versión 2.1</p>
 <div class="row"><button class="p" data-a="export">Guardar copia (.json)</button><button data-a="theme">Cambiar tema</button></div>
 <textarea id="bk" style="margin-top:10px" hidden aria-label="Copia en texto"></textarea><p class="k" id="ms"></p></div>
 <div class="c"><h2>Restaurar o importar</h2>

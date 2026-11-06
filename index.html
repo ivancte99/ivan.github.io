@@ -113,6 +113,15 @@ label.k input,label.k select{width:100%;display:block;margin-top:4px}
 <button class="p" id="ga" data-a="add-go" style="width:100%;margin-top:10px">Crear meta</button></div>
 <div class="c"><h2>Tus metas</h2><div id="go"></div></div></div></section>
 
+<section id="t-tra" hidden><div class="g g5" id="tk"></div>
+<div class="g g2" style="margin-top:12px"><div class="c"><h2>Apuntar gasto o payout de trading</h2>
+<div class="row"><select id="tkd" aria-label="Tipo"></select></div>
+<div class="row" style="margin-top:8px"><input id="tam" inputmode="decimal" placeholder="Importe €"><input id="tdt" type="date"></div>
+<div class="row" style="margin-top:8px"><select id="tac" aria-label="Cuenta"></select><input id="tnt" placeholder="Concepto (firma, herramienta…)" maxlength="80"></div>
+<button class="p" id="tadd" data-a="tra-add" style="width:100%;margin-top:10px">Apuntar</button>
+<p class="note" style="margin-top:10px" id="tnote"></p></div>
+<div class="c"><h2>Por tipo de gasto</h2><div id="tkb"></div></div></div>
+<div class="c" style="margin-top:12px"><h2>Movimientos de trading</h2><div id="tls"></div></div></section>
 <section id="t-sim" hidden><div class="g g2"><div class="c"><h2>🚀 Simulador de inversión</h2><p class="note">Una proyección con supuestos, no una previsión. La rentabilidad real varía y puede ser negativa.</p>
 <div class="row"><label class="k">Capital inicial €<input id="s1" type="number" value="0"></label><label class="k">Aportación mensual €<input id="s2" type="number" value="200"></label></div>
 <div class="row" style="margin-top:8px"><label class="k">Rentabilidad bruta anual %<input id="s3" type="number" step="0.1" value="5"></label><label class="k">Años<input id="s4" type="number" value="20"></label></div>
@@ -121,7 +130,7 @@ label.k input,label.k select{width:100%;display:block;margin-top:4px}
 <div class="c"><h2>Resultado</h2><div id="so"></div></div></div></section>
 
 <section id="t-dat" hidden><div class="g g2"><div class="c"><h2>Copia de seguridad</h2>
-<p class="note">Tus datos se guardan solo en este dispositivo, dentro de la app. No hay copia en ningún otro sitio: si pierdes el móvil o desinstalas la app, se pierden. Guarda una copia cada semana en Archivos o en tu nube.</p><p class="k" id="bki"></p><p class="k">Versión 2.3</p>
+<p class="note">Tus datos se guardan solo en este dispositivo, dentro de la app. No hay copia en ningún otro sitio: si pierdes el móvil o desinstalas la app, se pierden. Guarda una copia cada semana en Archivos o en tu nube.</p><p class="k" id="bki"></p><p class="k">Versión 2.4</p>
 <div class="row"><button class="p" data-a="export">Guardar copia (.json)</button><button data-a="theme">Cambiar tema</button></div>
 <textarea id="bk" style="margin-top:10px" hidden aria-label="Copia en texto"></textarea><p class="k" id="ms"></p></div>
 <div class="c"><h2>Restaurar o importar</h2>
@@ -134,14 +143,15 @@ label.k input,label.k select{width:100%;display:block;margin-top:4px}
 
 <script>
 'use strict';
-const CATS={Vivienda:'#6366f1',Comida:'#f59e0b',Transporte:'#06b6d4',Ocio:'#ec4899',Salud:'#10b981',Compras:'#8b5cf6',Suscripciones:'#ef4444',Brentive:'#3b82f6',Familia:'#f97316',Otros:'#94a3b8'}
+const CATS={Vivienda:'#6366f1',Comida:'#f59e0b',Transporte:'#06b6d4',Ocio:'#ec4899',Salud:'#10b981',Compras:'#8b5cf6',Suscripciones:'#ef4444',Brentive:'#3b82f6',Familia:'#f97316',Trading:'#14b8a6',Otros:'#94a3b8'}
 const catN=c=>c==='Formación'?'Brentive':c; /* nombre antiguo → nuevo, para datos y copias previas */;
-const INC=['Nómina','Extra','Otros ingresos'];
-const EM={Vivienda:'🏠',Comida:'🍽️',Transporte:'🚗',Ocio:'🎉',Salud:'💊',Compras:'🛍️',Suscripciones:'📺',Brentive:'💼',Familia:'👪',Otros:'📦','Nómina':'💼',Extra:'✨','Otros ingresos':'💰',Transferencia:'↔️',Ajuste:'⚖️'};
+const INC=['Nómina','Extra','Otros ingresos','Payout'];
+const TK={eval:'Evaluación de cuenta de fondeo',reset:'Reset de evaluación',herr:'Herramientas y plataformas',dat:'Datos y señales',otro:'Otro gasto de trading'};
+const EM={Vivienda:'🏠',Comida:'🍽️',Transporte:'🚗',Ocio:'🎉',Salud:'💊',Compras:'🛍️',Suscripciones:'📺',Brentive:'💼',Familia:'👪',Trading:'💹',Otros:'📦','Nómina':'💼',Extra:'✨','Otros ingresos':'💰',Payout:'🏆',Transferencia:'↔️',Ajuste:'⚖️'};
 const ATYPES=['Cuenta','Ahorro','Efectivo','Inversión','Deuda'];
 const ACOL={Cuenta:'#6366f1',Ahorro:'#10b981','Inversión':'#f59e0b',Efectivo:'#06b6d4',Deuda:'#ef4444'};
 const SAV=['Ahorro','Inversión'];
-const TABS=[['res','Resumen'],['pat','Patrimonio'],['mov','Movimientos'],['imp','Importar'],['pre','Presupuestos'],['aho','Ahorro'],['sim','Simulador'],['dat','Datos']];
+const TABS=[['res','Resumen'],['pat','Patrimonio'],['mov','Movimientos'],['imp','Importar'],['pre','Presupuestos'],['aho','Ahorro'],['tra','Trading'],['sim','Simulador'],['dat','Datos']];
 
 /* ---------- utilidades ---------- */
 const $=i=>document.getElementById(i);
@@ -173,6 +183,7 @@ function cleanTx(x){
   const o={id:rid(x.id),t,a,d,c,n:str(x.n,80),ac:x.ac?rid(x.ac):null};
   if(t==='t')o.to=x.to?rid(x.to):null;
   if(x.go)o.go=rid(x.go);
+  if(c==='Trading'&&t==='g'&&typeof x.k==='string'&&has(TK,x.k))o.k=x.k;
   if(x.r)o.r=str(x.r,60);
   return o}
 function cleanTxs(arr){return(Array.isArray(arr)?arr:[]).slice(0,5000).map(cleanTx).filter(Boolean)}
@@ -316,7 +327,7 @@ function saveTx(){
   const t={id:editing||uid(),t:ftype,a,d,c:ftype==='t'?'Transferencia':$('ct').value,n:$('nt').value.trim().slice(0,80),ac:$('ac').value||null};
   if(ftype==='t'){t.to=$('to').value||null;if(!t.ac||!t.to||t.ac===t.to){toast('Elige dos cuentas distintas: origen y destino.');return}}
   else if(S.core.ac.length&&!t.ac){toast('Elige la cuenta del movimiento.');return}
-  if(editing){const old=removeTx(editing);if(old){if(old.go)t.go=old.go;if(old.r)t.r=old.r}}
+  if(editing){const old=removeTx(editing);if(old){if(old.go)t.go=old.go;if(old.r)t.r=old.r;if(old.k&&t.c==='Trading'&&t.t==='g')t.k=old.k}}
   addTx(t);resetForm();render();toast(editing?'Cambios guardados.':'Movimiento apuntado.')}
 function startEdit(id){const t=findTx(id);if(!t||t.t==='a')return;editing=id;setType(t.t);
   $('am').value=(t.a/100).toFixed(2).replace('.',',');$('dt').value=t.d;$('nt').value=t.n||'';
@@ -412,7 +423,32 @@ function renderAho(){
 
 function render(){
   const[y,m]=cur.split('-');$('ml').textContent=new Date(+y,+m-1,1).toLocaleDateString('es-ES',{month:'long',year:'numeric'});
-  renderRes();renderPat();renderMov();renderPre();renderAho();backupUI();show(tab)}
+  renderRes();renderPat();renderMov();renderPre();renderAho();renderTra();backupUI();show(tab)}
+
+/* ---------- trading ---------- */
+const isTra=t=>(t.t==='g'&&t.c==='Trading')||(t.t==='i'&&t.c==='Payout');
+function renderTra(){
+  const T=all().filter(isTra),mo=curM();
+  const g=T.filter(t=>t.t==='g'),p=T.filter(t=>t.t==='i'),sum=a=>a.reduce((s,t)=>s+t.a,0);
+  const gt=sum(g),pt=sum(p),gm=sum(g.filter(t=>t.d.slice(0,7)===mo)),net=pt-gt;
+  $('tk').innerHTML=[['Gastado en total',eur(gt),'out'],['Payouts cobrados',eur(pt),'in'],['Neto (payouts − gastos)',eur(net),net>=0?'in':'out'],['Gastado este mes',eur(gm),'']].map(([k,v,c])=>'<div class="c"><div class="k">'+k+'</div><div class="v '+c+'">'+v+'</div></div>').join('');
+  const by={};g.forEach(t=>{const k=t.k||'otro';by[k]=(by[k]||0)+t.a});
+  const ar=Object.entries(by).sort((a,b)=>b[1]-a[1]);
+  $('tkb').innerHTML=ar.length?ar.map(([k,v])=>'<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(TK[k]||TK.otro)+'</span><b>'+eur(v)+'</b></div><div class="bar"><i style="width:'+Math.round(v/gt*100)+'%;background:'+CATS.Trading+'"></i></div></div>').join('')+(gt>0?'<p class="k">Has recuperado el '+Math.round(pt/gt*100)+' % de lo gastado con payouts.</p>':''):'<div class="empty">Aún no has apuntado gastos de trading</div>';
+  const inv=S.core.ac.filter(a=>a.t==='Inversión'),rest=S.core.ac.filter(a=>a.t!=='Inversión');
+  fillSel($('tac'),inv.concat(rest).map(a=>[a.id,a.n+(a.t==='Inversión'?' (inversión)':'')]),S.core.ac.length?null:'(sin cuentas)');
+  fillSel($('tkd'),Object.entries(TK).concat([['payout','Payout cobrado (ingreso)']]));
+  if(!$('tdt').value)$('tdt').value=todayS();
+  $('tnote').textContent=(inv.length?'Se apunta en la cuenta elegida; por defecto, tu cuenta de inversión: los gastos le restan valor y los payouts se lo suman. ':'Crea una cuenta de tipo Inversión en Patrimonio para ligar el trading a ella. ')+'Además cuentan como gasto o ingreso del mes, así que afectan a tu tasa de ahorro.';
+  const an=id=>{const a=accById(id);return a?a.n:''};
+  const L=T.sort((a,b)=>b.d.localeCompare(a.d)||(b.id>a.id?1:-1)).slice(0,60);
+  $('tls').innerHTML=L.length?L.map(t=>{const inc=t.t==='i';return'<div class="li"><span class="dot" style="background:'+(inc?'var(--gr)':CATS.Trading)+'"></span><div class="grow"><b>'+(inc?'🏆 Payout':'💹 '+esc(TK[t.k]||TK.otro))+'</b><small>'+t.d.split('-').reverse().join('/')+(t.n?' · '+esc(t.n):'')+(an(t.ac)?' · '+esc(an(t.ac)):'')+'</small></div><b class="'+(inc?'in':'out')+'">'+(inc?'+':'−')+eur(t.a)+'</b><button class="x" data-a="edit-tx" data-id="'+esc(t.id)+'" aria-label="Editar">✎</button><button class="x" data-a="del-tx" data-id="'+esc(t.id)+'" aria-label="Eliminar">✕</button></div>'}).join(''):'<div class="empty">Sin movimientos de trading</div>'}
+function addTra(){
+  const a=toC($('tam').value);if(!(a>0)){toast('Escribe un importe mayor que 0.');return}
+  const kd=$('tkd').value,ac=$('tac').value||null;if(S.core.ac.length&&!ac){toast('Elige la cuenta.');return}
+  const t={id:uid(),t:kd==='payout'?'i':'g',a,d:dstr($('tdt').value)||todayS(),c:kd==='payout'?'Payout':'Trading',n:$('tnt').value.trim().slice(0,80),ac};
+  if(kd!=='payout'&&has(TK,kd))t.k=kd;
+  addTx(t);$('tam').value='';$('tnt').value='';render();toast(kd==='payout'?'Payout apuntado.':'Gasto de trading apuntado.')}
 
 /* ---------- simulador ---------- */
 function sim(){
@@ -431,6 +467,7 @@ const newImp=()=>({step:0,acc:'',tbl:[],hrow:1,map:{d:-1,c:-1,c2:-1,a:-1,deb:-1,
 let imp=newImp(),lastImport=null;
 const STOP=['compra','tarjeta','tarj','pago','recibo','visa','mastercard','bizum','sepa','transferencia','lastschrift','kartenzahlung','card','payment','purchase','para','the','and'];
 const BUILTIN=[
+ [/tradingview|ftmo|topstep|apex trader|apextrader|tradovate|ninjatrader|myfundedfx|the5ers|fundingpips|alpha capital|funded next|fundednext/,'g','Trading'],
  [/mercadona|lidl|aldi|carrefour|rewe|edeka|supercor|alcampo|eroski|kaufland|netto|penny|restaurante|cafeteria|mcdonald|burger king|glovo|just eat|uber eats|lieferando|backerei|panaderia|supermercado/,'g','Comida'],
  [/netflix|spotify|hbo|disney|prime video|youtube|icloud|dazn|openai|chatgpt|google one|patreon/,'g','Suscripciones'],
  [/renfe|\buber\b(?! eats)|cabify|bolt|blablacar|gasolin|repsol|shell|cepsa|aral|esso|parking|peaje|flixbus|ryanair|vueling|iberia|deutsche bahn|\bdb\b/,'g','Transporte'],
@@ -656,6 +693,7 @@ document.addEventListener('click',e=>{
     case'save-tx':saveTx();break;
     case'cancel-edit':resetForm();break;
     case'edit-tx':startEdit(id);break;
+    case'tra-add':addTra();break;
     case'del-tx':{const t=removeTx(id);if(t){render();toast('Movimiento eliminado.',()=>{addTx(t);render()})}break}
     case'add-rc':{
       const t=$('rt').value,c=$('rc').value,am=toC($('ra').value),d=parseInt($('rd').value,10),ac=$('rac').value||null,to=$('rto').value||null;

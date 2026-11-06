@@ -130,7 +130,7 @@ label.k input,label.k select{width:100%;display:block;margin-top:4px}
 <div class="c"><h2>Resultado</h2><div id="so"></div></div></div></section>
 
 <section id="t-dat" hidden><div class="g g2"><div class="c"><h2>Copia de seguridad</h2>
-<p class="note">Tus datos se guardan solo en este dispositivo, dentro de la app. No hay copia en ningún otro sitio: si pierdes el móvil o desinstalas la app, se pierden. Guarda una copia cada semana en Archivos o en tu nube.</p><p class="k" id="bki"></p><p class="k">Versión 2.4</p>
+<p class="note">Tus datos se guardan solo en este dispositivo, dentro de la app. No hay copia en ningún otro sitio: si pierdes el móvil o desinstalas la app, se pierden. Guarda una copia cada semana en Archivos o en tu nube.</p><p class="k" id="bki"></p><p class="k">Versión 2.5</p>
 <div class="row"><button class="p" data-a="export">Guardar copia (.json)</button><button data-a="theme">Cambiar tema</button></div>
 <textarea id="bk" style="margin-top:10px" hidden aria-label="Copia en texto"></textarea><p class="k" id="ms"></p></div>
 <div class="c"><h2>Restaurar o importar</h2>
@@ -143,11 +143,12 @@ label.k input,label.k select{width:100%;display:block;margin-top:4px}
 
 <script>
 'use strict';
-const CATS={Vivienda:'#6366f1',Comida:'#f59e0b',Transporte:'#06b6d4',Ocio:'#ec4899',Salud:'#10b981',Compras:'#8b5cf6',Suscripciones:'#ef4444',Brentive:'#3b82f6',Familia:'#f97316',Trading:'#14b8a6',Otros:'#94a3b8'}
-const catN=c=>c==='Formación'?'Brentive':c; /* nombre antiguo → nuevo, para datos y copias previas */;
+const CATS={Vivienda:'#6366f1',Supermercado:'#f59e0b','Comida fuera':'#84cc16',Transporte:'#06b6d4',Ocio:'#ec4899',Salud:'#10b981',Compras:'#8b5cf6',Suscripciones:'#ef4444',Brentive:'#3b82f6',Familia:'#f97316',Trading:'#14b8a6',Otros:'#94a3b8'}
+const LEG={Brentive:'Formación',Supermercado:'Comida'};
+const catN=c=>c==='Formación'?'Brentive':c==='Comida'?'Supermercado':c; /* nombre antiguo → nuevo, para datos y copias previas */;
 const INC=['Nómina','Extra','Otros ingresos','Payout'];
 const TK={eval:'Evaluación de cuenta de fondeo',reset:'Reset de evaluación',herr:'Herramientas y plataformas',dat:'Datos y señales',otro:'Otro gasto de trading'};
-const EM={Vivienda:'🏠',Comida:'🍽️',Transporte:'🚗',Ocio:'🎉',Salud:'💊',Compras:'🛍️',Suscripciones:'📺',Brentive:'💼',Familia:'👪',Trading:'💹',Otros:'📦','Nómina':'💼',Extra:'✨','Otros ingresos':'💰',Payout:'🏆',Transferencia:'↔️',Ajuste:'⚖️'};
+const EM={Vivienda:'🏠',Supermercado:'🛒','Comida fuera':'🍽️',Transporte:'🚗',Ocio:'🎉',Salud:'💊',Compras:'🛍️',Suscripciones:'📺',Brentive:'💼',Familia:'👪',Trading:'💹',Otros:'📦','Nómina':'💼',Extra:'✨','Otros ingresos':'💰',Payout:'🏆',Transferencia:'↔️',Ajuste:'⚖️'};
 const ATYPES=['Cuenta','Ahorro','Efectivo','Inversión','Deuda'];
 const ACOL={Cuenta:'#6366f1',Ahorro:'#10b981','Inversión':'#f59e0b',Efectivo:'#06b6d4',Deuda:'#ef4444'};
 const SAV=['Ahorro','Inversión'];
@@ -174,7 +175,7 @@ const cents=n=>{n=Math.round(Number(n));return Number.isFinite(n)&&Math.abs(n)<1
 const dstr=s=>typeof s==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(s)?s:null;
 const mstr=s=>typeof s==='string'&&/^\d{4}-\d{2}$/.test(s)?s:null;
 const str=(s,n)=>String(s==null?'':s).slice(0,n);
-const defCore=()=>({v:2,ac:[],bu:{},go:[],rc:[],rl:[],st:{needs:['Vivienda','Comida','Transporte','Salud'],tg:[50,30,20]}});
+const defCore=()=>({v:2,ac:[],bu:{},go:[],rc:[],rl:[],st:{needs:['Vivienda','Supermercado','Transporte','Salud'],tg:[50,30,20]}});
 function cleanTx(x){
   if(!x||typeof x!=='object')return null;
   const t=['g','i','t','a'].includes(x.t)?x.t:null,d=dstr(x.d),a=cents(x.a);if(x)x={...x,c:catN(x.c)};
@@ -192,7 +193,7 @@ function cleanIm(m){if(!m||typeof m!=='object')return undefined;const g=k=>str(m
 function cleanCore(o){
   const c=defCore();if(!o||typeof o!=='object')return c;
   c.ac=(Array.isArray(o.ac)?o.ac:[]).slice(0,100).map(a=>a&&typeof a==='object'&&ATYPES.includes(a.t)?{id:rid(a.id),n:str(a.n,40)||'Cuenta',t:a.t,ob:cents(a.ob),od:dstr(a.od)||todayS(),im:cleanIm(a.im),vals:(Array.isArray(a.vals)?a.vals:[]).slice(-500).map(v=>v&&dstr(v.d)?{d:v.d,v:cents(v.v)}:null).filter(Boolean)}:null).filter(Boolean);
-  if(o.bu&&typeof o.bu==='object')for(const k in CATS){const n=cents(has(o.bu,k)?o.bu[k]:k==='Brentive'?o.bu['Formación']:0);if(n>0)c.bu[k]=n}
+  if(o.bu&&typeof o.bu==='object')for(const k in CATS){const n=cents(has(o.bu,k)?o.bu[k]:has(LEG,k)?o.bu[LEG[k]]:0);if(n>0)c.bu[k]=n}
   c.go=(Array.isArray(o.go)?o.go:[]).slice(0,100).map(g=>g&&typeof g==='object'&&cents(g.t)>0?{id:rid(g.id),n:str(g.n,40)||'Meta',t:cents(g.t),s0:cents(g.s0)}:null).filter(Boolean);
   c.rc=(Array.isArray(o.rc)?o.rc:[]).slice(0,200).map(r=>{if(!r||typeof r!=='object'||!['g','i','t'].includes(r.t)||cents(r.a)<=0)return null;const d=Math.round(Number(r.d));if(!(d>=1&&d<=28))return null;
     r={...r,c:catN(r.c)};const cc=r.t==='g'?(has(CATS,r.c)?r.c:'Otros'):r.t==='i'?(INC.includes(r.c)?r.c:'Otros ingresos'):'Transferencia';
@@ -209,7 +210,7 @@ function fromV1(o){
     if(a.t==='Deuda')acc.ob=-Math.abs(b);
     else if(a.t==='Inversión'&&c>0){acc.ob=c;acc.vals=[{d:td,v:b-c}]}
     core.ac.push(acc)});
-  const bu=o.bu&&typeof o.bu==='object'?o.bu:{};for(const k in CATS){const n=Math.round((Number(has(bu,k)?bu[k]:k==='Brentive'?bu['Formación']:0)||0)*100);if(n>0)core.bu[k]=n}
+  const bu=o.bu&&typeof o.bu==='object'?o.bu:{};for(const k in CATS){const n=Math.round((Number(has(bu,k)?bu[k]:has(LEG,k)?bu[LEG[k]]:0)||0)*100);if(n>0)core.bu[k]=n}
   (Array.isArray(o.go)?o.go:[]).slice(0,100).forEach(g=>{const t=Math.round((Number(g&&g.t)||0)*100);if(t>0)core.go.push({id:uid(),n:str(g.n,40)||'Meta',t,s0:Math.round((Number(g.s)||0)*100)})});
   const now=new Date();
   (Array.isArray(o.rc)?o.rc:[]).slice(0,200).forEach(r=>{const a=Math.round((Number(r&&r.a)||0)*100),d=Math.round(Number(r&&r.d));if(!r||a<=0||!(d>=1&&d<=28)||!['g','i'].includes(r.t))return;
@@ -468,7 +469,8 @@ let imp=newImp(),lastImport=null;
 const STOP=['compra','tarjeta','tarj','pago','recibo','visa','mastercard','bizum','sepa','transferencia','lastschrift','kartenzahlung','card','payment','purchase','para','the','and'];
 const BUILTIN=[
  [/tradingview|ftmo|topstep|apex trader|apextrader|tradovate|ninjatrader|myfundedfx|the5ers|fundingpips|alpha capital|funded next|fundednext/,'g','Trading'],
- [/mercadona|lidl|aldi|carrefour|rewe|edeka|supercor|alcampo|eroski|kaufland|netto|penny|restaurante|cafeteria|mcdonald|burger king|glovo|just eat|uber eats|lieferando|backerei|panaderia|supermercado/,'g','Comida'],
+ [/mercadona|lidl|aldi|carrefour|rewe|edeka|supercor|alcampo|eroski|kaufland|netto|penny|supermerc|\bdia\b|\bconsum\b|panaderia|backerei/,'g','Supermercado'],
+ [/restaurante|cafeteria|\bcafe\b|mcdonald|burger king|glovo|just eat|uber eats|lieferando|pizz|kebab|starbucks|telepizza|\bbar\b/,'g','Comida fuera'],
  [/netflix|spotify|hbo|disney|prime video|youtube|icloud|dazn|openai|chatgpt|google one|patreon/,'g','Suscripciones'],
  [/renfe|\buber\b(?! eats)|cabify|bolt|blablacar|gasolin|repsol|shell|cepsa|aral|esso|parking|peaje|flixbus|ryanair|vueling|iberia|deutsche bahn|\bdb\b/,'g','Transporte'],
  [/farmacia|apotheke|clinica|hospital|dentista/,'g','Salud'],
